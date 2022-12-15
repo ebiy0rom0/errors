@@ -1,45 +1,37 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 )
 
-type appError struct {
-	msg   string
-	frame []frame
-	err   error
-	once  sync.Once
+type fundamental struct {
+	msg  string
+	st   stackTrace
+	once sync.Once
 }
 
 func New(msg string) error {
-	e := &appError{
+	e := &fundamental{
 		msg: msg,
 	}
-	e.once.Do(e.trace)
+	e.trace()
 	return e
 }
 
-func (e *appError) trace() {
-	pcs := callers()
-	e.frame = newFrame(pcs)
-}
-
-// TODO:
-func Wrap(err error, msg string) error {
-	var app *appError
-	if errors.As(err, &app) {
-		return app.Unwrap()
+func Errorf(format string, args ...any) error {
+	e := &fundamental{
+		msg: fmt.Sprintf(format, args...),
 	}
-	return New(err.Error())
+	e.trace()
+	return e
 }
 
-// TODO:
-func (e *appError) Error() string {
-	fmt.Println(e.frame)
-	return e.msg
+func (e *fundamental) trace() {
+	e.once.Do(func() {
+		pcs := callers()
+		e.st = newFrame(pcs)
+	})
 }
 
-// TODO:
-func (e *appError) Unwrap() error { return e.err }
+func (e *fundamental) Error() string { return e.msg }

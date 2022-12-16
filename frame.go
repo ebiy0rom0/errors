@@ -17,7 +17,7 @@ type stackTrace []frame
 func callers() []uintptr {
 	const depth = 32
 	var pcs [depth]uintptr
-	n := runtime.Callers(7, pcs[:])
+	n := runtime.Callers(8, pcs[:])
 	return pcs[0 : n-2]
 }
 
@@ -38,7 +38,7 @@ func newFrame(pcs []uintptr) (st stackTrace) {
 }
 
 func (f frame) output(no int) string {
-	return fmt.Sprintf("\t#%02d %s, line:%d", no, f.file, f.line)
+	return fmt.Sprintf("\t#%02d %s(%d): %s", no, f.file, f.line, f.name)
 }
 
 func (st stackTrace) output() string {

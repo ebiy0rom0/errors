@@ -17,19 +17,19 @@ type stackTrace []frame
 func callers() []uintptr {
 	const depth = 32
 	var pcs [depth]uintptr
-	n := runtime.Callers(8, pcs[:])
+	n := runtime.Callers(7, pcs[:])
 	return pcs[0 : n-2]
 }
 
 func newFrame(pcs []uintptr) (st stackTrace) {
 	for _, pc := range pcs {
-		f := frame{pc: pc}
-		fn := runtime.FuncForPC(pc)
+		f := frame{pc: pc - 1}
+		fn := runtime.FuncForPC(f.pc)
 		if fn == nil {
 			return
 		}
 
-		f.file, f.line = fn.FileLine(pc)
+		f.file, f.line = fn.FileLine(f.pc)
 		f.name = fn.Name()
 
 		st = append(st, f)

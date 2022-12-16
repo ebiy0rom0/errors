@@ -38,7 +38,7 @@ func newFrame(pcs []uintptr) (st stackTrace) {
 }
 
 func (f frame) output(no int) string {
-	return fmt.Sprintf("#%02d %s, line:%d", no, f.file, f.line)
+	return fmt.Sprintf("\t#%02d %s, line:%d", no, f.file, f.line)
 }
 
 func (st stackTrace) output() string {

@@ -35,3 +35,12 @@ func (e *fundamental) trace() {
 }
 
 func (e *fundamental) Error() string { return e.msg }
+
+func (e *fundamental) Format(f fmt.State, c rune) {
+	switch c {
+	case 'v':
+		fmt.Fprintf(f, "cause='%s'\nstackTrace:\n%s", e.Error(), e.st.output())
+	case 's':
+		fmt.Fprint(f, e.Error())
+	}
+}

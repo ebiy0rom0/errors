@@ -11,7 +11,7 @@ func TestNew(t *testing.T) {
 		name string
 		msg  string
 	}{
-		{name: "new error", msg: "error message"},
+		{name: "new error", msg: "error"},
 		{name: "not found", msg: "file not found"},
 	}
 	for _, tt := range tests {
@@ -39,16 +39,27 @@ func TestErrorf(t *testing.T) {
 		args   []any
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name string
+		args args
 	}{
-		// TODO: Add test cases.
+		{name: "string format", args: args{format: "%s", args: []any{"error"}}},
+		{name: "number format", args: args{format: "%d", args: []any{123}}},
+		{name: "struct format", args: args{format: "%v", args: []any{struct{ msg string }{msg: "error"}}}},
+		{name: "multiple format", args: args{format: "%s %d %v", args: []any{"error", 123, struct{ msg string }{msg: "error"}}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Errorf(tt.args.format, tt.args.args...); (err != nil) != tt.wantErr {
-				t.Errorf("Errorf() error = %v, wantErr %v", err, tt.wantErr)
+			err := Errorf(tt.args.format, tt.args.args...)
+			msg := fmt.Sprintf(tt.args.format, tt.args.args...)
+			if err.Error() != msg {
+				t.Errorf("unmatch Error() message. out=%s, want=%s", err.Error(), msg)
+			}
+
+			var buf bytes.Buffer
+			if _, err := buf.WriteString(fmt.Sprintf("%v", err)); err != nil {
+				t.Errorf("error unexpected. err=%v", err)
+			} else {
+				t.Logf("%v", buf.String())
 			}
 		})
 	}

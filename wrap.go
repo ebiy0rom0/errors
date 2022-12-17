@@ -59,7 +59,7 @@ func (e *wrapError) Error() string { return e.msg + ": " + e.err.Error() }
 func (e *wrapError) Format(f fmt.State, c rune) {
 	switch c {
 	case 'v':
-		fmt.Fprintf(f, "cause='%s'\nstackTrace:\n%s", e.Error(), e.origin().output())
+		fmt.Fprintf(f, "cause='%s'\nstackTrace:\n%v", e.Error(), e.origin())
 	case 's':
 		fmt.Fprint(f, e.Error())
 	}

@@ -23,12 +23,17 @@ func TestNew(t *testing.T) {
 				t.Log(err.Error())
 			}
 
+			// check implements fmt.Formatter
 			var buf bytes.Buffer
 			if _, err := buf.WriteString(fmt.Sprintf("%v", err)); err != nil {
 				t.Errorf("error unexpected. err=%v", err)
-			} else {
-				t.Logf("%v", buf.String())
 			}
+			if _, err := buf.WriteString(fmt.Sprintf("%s", err)); err != nil {
+				t.Errorf("error unexpected. err=%s", err)
+			}
+
+			// output log
+			t.Log(buf.String())
 		})
 	}
 }
@@ -55,12 +60,17 @@ func TestErrorf(t *testing.T) {
 				t.Errorf("unmatch Error() message. out=%s, want=%s", err.Error(), msg)
 			}
 
+			// check implements fmt.Formatter
 			var buf bytes.Buffer
 			if _, err := buf.WriteString(fmt.Sprintf("%v", err)); err != nil {
 				t.Errorf("error unexpected. err=%v", err)
-			} else {
-				t.Logf("%v", buf.String())
 			}
+			if _, err := buf.WriteString(fmt.Sprintf("%s", err)); err != nil {
+				t.Errorf("error unexpected. err=%s", err)
+			}
+
+			// output log
+			t.Log(buf.String())
 		})
 	}
 }

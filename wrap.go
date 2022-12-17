@@ -53,6 +53,7 @@ func (e *wrapError) trace() {
 	})
 }
 
+func (e *wrapError) Unwrap() error { return e.err }
 func (e *wrapError) Error() string { return e.msg + ": " + e.err.Error() }
 
 func (e *wrapError) Format(f fmt.State, c rune) {
@@ -65,11 +66,10 @@ func (e *wrapError) Format(f fmt.State, c rune) {
 }
 
 func (e *wrapError) origin() stackTrace {
-	var origin = e.st
-	if e, ok := e.err.(*wrapError); ok {
-		return e.origin()
-	} else if e, ok := e.err.(*fundamental); ok {
-		return e.st
+	if w, ok := e.err.(*wrapError); ok {
+		return w.origin()
+	} else if f, ok := e.err.(*fundamental); ok {
+		return f.st
 	}
-	return origin
+	return e.st
 }

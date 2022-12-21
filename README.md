@@ -8,7 +8,7 @@ It's reference pkg/errors and privides similar functionality.
 
 This package can be installed with the `go get` command:
 ```
-go get github.com/ebiy0rom0/erros
+go get github.com/ebiy0rom0/errors
 ```
 
 

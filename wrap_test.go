@@ -116,13 +116,15 @@ func TestWrapf(t *testing.T) {
 
 			// check implements fmt.Formatter
 			var buf bytes.Buffer
+			if _, err := buf.WriteString(fmt.Sprintf("%s\n", err)); err != nil {
+				t.Errorf("error unexpected. err=%s", err)
+			}
 			if _, err := buf.WriteString(fmt.Sprintf("%v", err)); err != nil {
 				t.Errorf("error unexpected. err=%v", err)
-			} else if _, err := buf.WriteString(fmt.Sprintf("%s", err)); err != nil {
-				t.Errorf("error unexpected. err=%s", err)
-			} else {
-				t.Logf("%v", buf.String())
 			}
+
+			// output log
+			t.Logf("%v", buf.String())
 		})
 	}
 
@@ -141,13 +143,15 @@ func TestWrapf(t *testing.T) {
 
 			// check implements fmt.Formatter
 			var buf bytes.Buffer
+			if _, err := buf.WriteString(fmt.Sprintf("%s\n", err)); err != nil {
+				t.Errorf("error unexpected. err=%s", err)
+			}
 			if _, err := buf.WriteString(fmt.Sprintf("%v", err)); err != nil {
 				t.Errorf("error unexpected. err=%v", err)
-			} else if _, err := buf.WriteString(fmt.Sprintf("%s", err)); err != nil {
-				t.Errorf("error unexpected. err=%s", err)
-			} else {
-				t.Logf("%v", buf.String())
 			}
+
+			// output log
+			t.Logf("%v", buf.String())
 		})
 	}
 }

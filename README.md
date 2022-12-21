@@ -3,6 +3,7 @@
 Package errors is simple error handler for Go language.  
 It's reference pkg/errors and privides similar functionality.
 
+
 ## Installation
 
 This package can be installed with the `go get` command:
@@ -10,7 +11,8 @@ This package can be installed with the `go get` command:
 go get github.com/ebiy0rom0/errros
 ```
 
-## How to use
+
+## Usage
 
 This package obtains stack traces for all functions.  
 If want to issue your own errors(e.g. validation checks) use `errors.New` or `errors.Errorf`.
@@ -23,7 +25,8 @@ If want to issue your own errors(e.g. validation checks) use `errors.New` or `er
   }
 ```
 
-If using an existing error or an error returned by a function, use `errors.Wrap` or `errors.Wrapf`. Both can wrap variables that satisfy the error interface.
+If using an existing error or an error returned by a function, use `errors.Wrap` or `errors.Wrapf`.
+Both can wrap variables that satisfy the error interface.
 ```go
   // Cases failed file open and returned os.ErrNotExist
   name := "example.log"
@@ -35,12 +38,25 @@ If using an existing error or an error returned by a function, use `errors.Wrap`
   }
 ```
 
+`errors.Wrap` and `errors.Wrapf` implements `Unwrap` and can be checked with standard `errors.Is` and `errors.As`.
+```go
+  // fileopen() returns os.ErrNotExist wrapped by errors.Wrap
+  err := fileopen(name)
+  if errors.Is(err, os.ErrNotExist) {
+    fmt.Printf("error is %v", os.ErrNotExist)
+  }
+```
+
+
 ## Formatted printing of errors
+
 This package implement fmt.Formatter and supports `%s` and `%v` by the fmt package.
 ```
-%s  print the error. If for wrapped error, print at chained recursively.
+%s  print the error. If for wrapped error, 
+    print at chained recursively.
 %v  simultaneously printed stack trace obtained at oldest.
 ```
+
 
 ## License
 

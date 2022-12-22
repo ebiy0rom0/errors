@@ -5,12 +5,15 @@ import (
 	"sync"
 )
 
+// basic error struct
 type fundamental struct {
 	msg  string
 	st   stackTrace
 	once sync.Once
 }
 
+// New returns the error interface that added stack trace.
+// Specify any string for the error message.
 func New(msg string) error {
 	e := &fundamental{
 		msg: msg,
@@ -19,6 +22,8 @@ func New(msg string) error {
 	return e
 }
 
+// Errorf returns the error interface that added stack trace.
+// Standard formatting can be used for error message.
 func Errorf(format string, args ...any) error {
 	e := &fundamental{
 		msg: fmt.Sprintf(format, args...),
@@ -27,6 +32,8 @@ func Errorf(format string, args ...any) error {
 	return e
 }
 
+// trace obtains and saves a stack trace.
+// Stack trace are obtained only once at runtime.
 func (e *fundamental) trace() {
 	e.once.Do(func() {
 		pcs := callers()
@@ -34,8 +41,12 @@ func (e *fundamental) trace() {
 	})
 }
 
+// Errors returns error message.
+// It's an implementation of the error interface.
 func (e *fundamental) Error() string { return e.msg }
 
+// Format is specify formatting rule for print.
+// It's an implementation of the fmt.Formatter interface.
 func (e *fundamental) Format(f fmt.State, c rune) {
 	switch c {
 	case 'v':

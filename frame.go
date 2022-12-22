@@ -5,6 +5,7 @@ import (
 	"runtime"
 )
 
+// structure of the frame to be obtained
 type frame struct {
 	pc   uintptr
 	name string
@@ -12,8 +13,12 @@ type frame struct {
 	line int
 }
 
+// structure of stack trace
 type stackTrace []frame
 
+// caller returns program counters from the point where the function was called.
+// skip values are customized for this package, don't use them elsewhere and
+// keep the calling hierarchy consistent.
 func callers() []uintptr {
 	const depth = 32
 	var pcs [depth]uintptr
@@ -21,6 +26,7 @@ func callers() []uintptr {
 	return pcs[0 : n-2]
 }
 
+// newFrame returns the stack trace.
 func newFrame(pcs []uintptr) (st stackTrace) {
 	for _, pc := range pcs {
 		f := frame{pc: pc - 1}
@@ -37,10 +43,12 @@ func newFrame(pcs []uintptr) (st stackTrace) {
 	return
 }
 
+// output returns the formed stack trace.
 func (f frame) output(no int) string {
 	return fmt.Sprintf("\t#%02d %s(%d): %s", no, f.file, f.line, f.name)
 }
 
+// output returns the formed stack trace for all.
 func (st stackTrace) output() string {
 	var text = make([]byte, 0, 512)
 	for no, f := range st {
@@ -50,6 +58,8 @@ func (st stackTrace) output() string {
 	return string(text)
 }
 
+// Format is specify formatting rule for print.
+// It's an implementation of the fmt.Formatter interface.
 func (st stackTrace) Format(f fmt.State, c rune) {
 	switch c {
 	case 'v':

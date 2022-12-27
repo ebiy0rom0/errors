@@ -57,13 +57,13 @@ func (e *fundamental) Format(f fmt.State, c rune) {
 	}
 }
 
-// Is is a wrapper for the standard errors.Is().
+// Is the wrapper for the standard errors.Is().
 // It's returns same result.
 func Is(err, target error) bool {
 	return errors.Is(err, target)
 }
 
-// As is a wrapper for the standard errors.As().
+// As the wrapper for the standard errors.As().
 // It's returns same result.
 func As(err error, target any) bool {
 	return errors.As(err, target)

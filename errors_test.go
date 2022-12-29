@@ -2,7 +2,9 @@ package errors
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -76,6 +78,8 @@ func TestErrorf(t *testing.T) {
 }
 
 func TestIs(t *testing.T) {
+	stdErr := errors.New("error")
+	libErr := New("lib error")
 	type args struct {
 		err    error
 		target error
@@ -83,20 +87,31 @@ func TestIs(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want bool
 	}{
-		// TODO: Add test cases.
+		{name: "std error", args: args{err: stdErr, target: stdErr}},
+		{name: "predefined error", args: args{err: os.ErrNotExist, target: os.ErrNotExist}},
+		{name: "lib error", args: args{err: libErr, target: libErr}},
+		{name: "generated from predefined error", args: args{err: stdErr, target: Wrap(stdErr, "wrap error")}},
+		{name: "error is nil", args: args{err: nil, target: nil}},
 	}
 	for _, tt := range tests {
+		// Test cases are assumed to return true for all patterns.
+		// If returned false, the error creator is likely to have a problem
+		// and will be notified.
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Is(tt.args.err, tt.args.target); got != tt.want {
-				t.Errorf("Is() = %v, want %v", got, tt.want)
+			want := errors.Is(tt.args.err, tt.args.target)
+			if got := Is(tt.args.err, tt.args.target); got != want {
+				t.Errorf("Is() returns different results of errors.Is(). result=%v, want %v", got, want)
+			} else if !got {
+				t.Log("Is() returns false.")
 			}
 		})
 	}
 }
 
 func TestAs(t *testing.T) {
+	stdErr := errors.New("error")
+	libErr := New("lib error")
 	type args struct {
 		err    error
 		target any
@@ -106,7 +121,11 @@ func TestAs(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{name: "std error", args: args{err: stdErr, target: stdErr}, want: true},
+		{name: "predefined error", args: args{err: stdErr, target: os.ErrNotExist}, want: true},
+		{name: "lib error", args: args{err: libErr, target: libErr}, want: true},
+		{name: "defferent type error", args: args{err: stdErr, target: libErr}, want: false},
+		{name: "std error", args: args{err: stdErr, target: stdErr}, want: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

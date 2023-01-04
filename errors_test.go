@@ -88,10 +88,15 @@ func TestIs(t *testing.T) {
 		name string
 		args args
 	}{
-		{name: "std error", args: args{err: stdErr, target: stdErr}},
-		{name: "predefined error", args: args{err: os.ErrNotExist, target: os.ErrNotExist}},
-		{name: "lib error", args: args{err: libErr, target: libErr}},
-		{name: "generated from predefined error", args: args{err: stdErr, target: Wrap(stdErr, "wrap error")}},
+		{name: "std error", args: args{err: stdErr, target: fmt.Errorf("wrap: %w", stdErr)}},
+		{name: "predefined error", args: args{err: os.ErrNotExist, target: fmt.Errorf("wrap: %w", os.ErrNotExist)}},
+		{name: "lib error", args: args{err: libErr, target: fmt.Errorf("wrap: %w", libErr)}},
+		{name: "wrap std error", args: args{err: stdErr, target: Wrap(stdErr, "wrap std error")}},
+		{name: "wrap predefined error", args: args{err: os.ErrNotExist, target: Wrap(os.ErrNotExist, "wrap predefined error")}},
+		{name: "wrap lib error", args: args{err: libErr, target: Wrap(libErr, "wrap lib error")}},
+		{name: "wrapf std error", args: args{err: stdErr, target: Wrapf(stdErr, "%s", "wrapf std error")}},
+		{name: "wrapf predefined error", args: args{err: os.ErrNotExist, target: Wrapf(os.ErrNotExist, "%s", "wrapf predefined error")}},
+		{name: "wrapf lib error", args: args{err: libErr, target: Wrapf(libErr, "%s", "wrapf lib error")}},
 		{name: "error is nil", args: args{err: nil, target: nil}},
 	}
 	for _, tt := range tests {
@@ -110,8 +115,7 @@ func TestIs(t *testing.T) {
 }
 
 func TestAs(t *testing.T) {
-	stdErr := errors.New("error")
-	libErr := New("lib error")
+	err := New("lib error")
 	type args struct {
 		err    error
 		target any
@@ -119,18 +123,17 @@ func TestAs(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want bool
 	}{
-		{name: "std error", args: args{err: stdErr, target: stdErr}, want: true},
-		{name: "predefined error", args: args{err: stdErr, target: os.ErrNotExist}, want: true},
-		{name: "lib error", args: args{err: libErr, target: libErr}, want: true},
-		{name: "defferent type error", args: args{err: stdErr, target: libErr}, want: false},
-		{name: "std error", args: args{err: stdErr, target: stdErr}, want: true},
+		{name: "lib error", args: args{err: err, target: new(fundamental)}},
+		{name: "stdwrap error", args: args{err: fmt.Errorf("wrap: %w", err), target: new(fundamental)}},
+		{name: "wrap lib error", args: args{err: Wrap(err, "wrap error"), target: new(fundamental)}},
+		{name: "wrapf lib error", args: args{err: Wrapf(err, "%s", "wrapf error"), target: new(fundamental)}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := As(tt.args.err, tt.args.target); got != tt.want {
-				t.Errorf("As() = %v, want %v", got, tt.want)
+			want := errors.As(tt.args.err, &tt.args.target)
+			if got := As(tt.args.err, &tt.args.target); got != want {
+				t.Errorf("As() returns different results of errors.As(). result=%v, want %v", got, want)
 			}
 		})
 	}

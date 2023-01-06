@@ -25,7 +25,7 @@ If want to issue your own errors(e.g. validation checks) use `errors.New` or `er
   }
 ```
 
-If using an existing error or an error returned by a function, use `errors.Wrap` or `errors.Wrapf`.
+If using an existing error or an error returned by a function, use `errors.Wrap` or `errors.Wrapf`.  
 Both can wrap variables that satisfy the error interface.
 ```go
   // Cases failed file open and returned os.ErrNotExist
@@ -38,7 +38,21 @@ Both can wrap variables that satisfy the error interface.
   }
 ```
 
-`errors.Wrap` and `errors.Wrapf` implements `Unwrap` and can be checked with standard `errors.Is` and `errors.As`.
+If you don't want to add a message to the error to wrap, you can use `errors.WithStack`.  
+This is useful when the wrap message to be wrapped is equivalent to an error message.
+```go
+  // Cases failed check to file exists and returned os.ErrNotExist
+  name := "example.txt"
+  info, err := os.Stat(name)
+  if err != nil {
+    // The wrap message notifies that the file does not exist,
+    // but it's satisfied by os.ErrNotExist.
+    return errors.WithStack(err)
+  }
+```
+
+`errors.Wrap` and `errors.Wrapf` implements `Unwrap` and can be checked with standard `errors.Is` and `errors.As`.  
+Equivalent functions are provided by this package and can be used.
 ```go
   // fileopen() returns os.ErrNotExist wrapped by errors.Wrap
   err := fileopen(name)
